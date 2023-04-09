@@ -1,0 +1,12 @@
+[Unit]
+Description=drow
+After=syslog.target
+[Service]
+User=root
+WorkingDirectory=/var/drow/
+ExecStart=/usr/bin/java -jar latest.jar
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=30
+[Install]
+WantedBy=multi-user.target

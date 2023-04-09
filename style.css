@@ -1,0 +1,182 @@
+ :root {
+     --hover: #986bf1;
+     --bg: #181e23;
+     --text: #eceff4;
+     --main: #d8dee9;
+     --textw: .92vw;
+     --buttons: .96vw;
+     --titles: 1.06vw;
+ }
+
+ ::selection {
+     background: var(--bs-indigo);
+     color: var(--bg);
+ }
+
+ body {
+     scrollbar-width: thin;
+     scrollbar-color: var(--hover) var(--bg);
+ }
+
+ body::-webkit-scrollbar-track {
+     background: var(--bg);
+ }
+
+ body::-webkit-scrollbar-thumb {
+     background-color: var(--bs-indigo);
+     border-radius: 0px;
+     border: 3px solid var(--bg);
+ }
+
+ ::-webkit-scrollbar {
+     background: var(--bg);
+ }
+
+ ::-webkit-scrollbar-thumb {
+     background-color: var(--bs-indigo);
+
+ }
+
+ ::-webkit-scrollbar-corner {
+     background: #000;
+ }
+
+ @font-face {
+     font-family: 'Helvetica Neue';
+     src: url('-F63fjptAgt5VM-kVkqdyU8n1iAq129k.woff2') format('woff2');
+     font-weight: 300;
+     font-style: normal;
+     font-display: swap;
+ }
+
+ body {
+    font-family: 'IBM Plex Mono', monospace;
+ }
+
+ body {
+     background-color: var(--bg);
+     color: white;
+ }
+
+ .btn {
+     border-radius: 0px !important;
+     background-color: transparent;
+     color: var(--main) !important;
+     box-shadow: none !important;
+     outline: none !important;
+     border: 0px !important;
+     font-size: var(--buttons) !important;
+     padding: 0px 8px !important;
+ }
+
+ .btn:hover {
+     color: var(--hover) !important;
+ }
+
+ .btn-indigo {
+     border-radius: 0px !important;
+     background-color: transparent;
+     color: var(--main) !important;
+     box-shadow: none !important;
+     outline: none !important;
+     border: 1px solid var(--hover) !important;
+     font-size: var(--buttons) !important;
+     padding: 0px 8px !important;
+
+ }
+
+ .modal-body button {
+     text-align: center !important;
+     margin-top: 24px !important;
+ }
+
+ .btn-indigo:hover {
+     color: var(--text) !important;
+     background-color: var(--hover);
+ }
+
+ h1,
+ h2,
+ h3,
+ h4 {
+     font-size: var(--titles) !important;
+     color: var(--hover);
+     margin-bottom: 0px !important;
+ }
+
+ h5,
+ h6 {
+
+     font-size: var(--textw);
+     color: var(--text);
+ }
+
+ .form-control {
+     border-radius: 0px !important;
+     background-color: transparent;
+     color: var(--main) !important;
+     box-shadow: none !important;
+     outline: none !important;
+     border: 0px !important;
+     border-bottom: 2px solid var(--main) !important;
+     font-size: var(--titles);
+ }
+
+ .form-control:focus {
+     background-color: transparent;
+     color: var(--main) !important;
+     border-bottom: 2px solid var(--hover) !important;
+ }
+
+ .modal-body {
+     background-color: var(--bg) !important;
+
+ }
+
+ .modal-header {
+     background-color: var(--hover) !important;
+     color: var(--text) !important;
+
+ }
+
+ .fancy {
+     box-shadow: 0px 4px 16px rgba(0, 0, 0, .3);
+
+     /* linear gradient: */
+
+     background-color: rgba(14, 19, 22, 0.938);
+
+ }
+
+ .alert {
+     position: fixed;
+     bottom: 0px;
+     width: 60vw;
+     left: 20vw;
+     z-index: 99;
+ }
+
+ .pullThis .modal {
+     z-index: +1;
+ }
+
+ .modal-backdrop {
+     z-index: -1;
+ }
+
+ .DrowExpand {
+     position: fixed;
+     display: block;
+     width: 100vw;
+     height: 95vh;
+     top: 250vh;
+     z-index: 999;
+     overflow: scroll;
+     left: 0;
+     background-color: var(--bg);
+     transition: all 0.5s ease-in-out;
+ }
+
+ .DrowExpand.active {
+     transform: translateY(-245vh);
+ }

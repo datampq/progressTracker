@@ -1,0 +1,195 @@
+<?php
+include '_main.php';
+include 'pdf/fpdf.php';
+
+class PDF extends FPDF
+{
+    function Header()
+    {
+    }
+    function Footer()
+    {
+        $this->SetY(-15);
+        $font = 'HelveticaNeue-Light';
+        $this->SetFont($font, '', 8);
+        $this->Cell(0, 10, 'drowTracker | Page ' . $this->PageNo() . '/{nb}', 0, 0, 'C');
+    }
+}
+if (!empty($_GET['id'])) {
+    $id = $_GET['id'];
+} else {
+    header('Location:index.php');
+    exit;
+}
+$request = "SELECT * FROM project WHERE id = '" . $id . "'";
+$results = mysqli_query(Database::$conn, $request);
+$row = mysqli_fetch_assoc($results);
+$title = $row['title'];
+$dateEdited = $row['dateEdited'];
+$description = $row['description'];
+$author = $row['author'];
+$hoursW = $row['hoursW'];
+$startd = $row['startd'];
+$endd = $row['endd'];
+
+
+
+
+date_default_timezone_set('Europe/Berlin');
+$dateTimeCurrentCHHeure = date("d-m-Y H:i");
+$dateTimeCurrentCH = date("d-m-Y");
+$yearStamp = date("Y");
+$dayStamp = date("d");
+$monthStamp = date("m");
+
+
+
+$topMargin = 10;
+$leftMargin = 25;
+$rightMargin = 10;
+$pdf = new PDF();
+$font = 'HelveticaNeue-Light';
+$pdf->AddFont($font, '', $font . '.php');
+$pdf->SetFont($font, '', 11);
+$pdf->setMargins($leftMargin, 10, $rightMargin);
+$pdf->AliasNbPages();
+
+$pdf->SetFont($font, '', 14);
+
+$pdf->AddPage();
+
+
+//ad half page spacing:
+$h1 = 28;
+$h2 = 18;
+$h3 = 14;
+$h4 = 12;
+$h5 = 11;
+$pdf->Ln(80);
+$pdf->SetFont('HelveticaNeue-Light', '', $h1);
+$pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h1 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $title), 0, 1);
+
+$pdf->SetFont('HelveticaNeue-Light', '', $h3);
+$pdf->MultiCell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h3 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Last edited on: ' . $dateEdited . ' by: ' . $author), 0, 1);
+
+$pdf->SetFont('HelveticaNeue-Light', '', $h5);
+$pdf->MultiCell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Total hours: ' . $hoursW . ' (' . $startd . ' - ' . $endd . ')'), 0, 1);
+
+$pdf->Ln(10);
+
+$pdf->SetFont('HelveticaNeue-Light', '', $h5);
+$pdf->MultiCell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $description), 0, 1);
+
+
+$pdf->AddPage();
+$pdf->Ln(20);
+$pdf->SetFont('HelveticaNeue-Light', '', $h2);
+$pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h2 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Contents'), 0, 1);
+
+
+//get oage where projectId = $id:
+$request = "SELECT * FROM page WHERE projectId = '" . $id . "'";
+$results = mysqli_query(Database::$conn, $request);
+$i = 1;
+while ($row = mysqli_fetch_assoc($results)) {
+
+    $pdf->SetFont('HelveticaNeue-Light', '', $h4);
+    //function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link='')
+    $pdf->Cell($pdf->GetPageWidth() / 2 - intval($rightMargin) * 4, $h4 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $i . '. ' . $row['title']), 0, 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h4 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['dateEdited']), 0, 1, 'R');
+
+    $i++;
+}
+$pdf->AddPage();
+$pdf->Ln(20);
+$pdf->SetFont('HelveticaNeue-Light', '', $h2);
+$pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h2 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Notes'), 0, 1);
+
+$request = "SELECT * FROM todos WHERE projectid = '" . $id . "'";
+$results = mysqli_query(Database::$conn, $request);
+$i = 1;
+while ($row = mysqli_fetch_assoc($results)) {
+    $pdf->Ln(4);
+    $pdf->SetFont('HelveticaNeue-Light', '', $h4);
+    //function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link='')
+    $pdf->Cell($pdf->GetPageWidth()  - intval($rightMargin) * 4, $h4 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $i . '. ' . $row['dateEdited']), 'B', 1);
+    $pdf->SetFont('HelveticaNeue-Light', '', $h5);
+    $pdf->Ln(2);
+    $pdf->MultiCell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['content']), 0, 1);
+
+    $i++;
+}
+$request = "SELECT * FROM page WHERE projectid = '" . $id . "'";
+$results = mysqli_query(Database::$conn, $request);
+while ($row = mysqli_fetch_assoc($results)) {
+    $pdf->AddPage();
+    $pdf->Ln(20);
+    $pdf->SetFont('HelveticaNeue-Light', '', $h2);
+    $pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h2 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['title']), 'B', 1);
+
+    $pdf->SetFont('HelveticaNeue-Light', '', $h4);
+    $pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h4 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Last edited: ' . $row['dateEdited']), 0, 1);
+
+    $pdf->SetFont('HelveticaNeue-Light', '', $h5);
+    $pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Version: ' . $row['versi']), 0, 1);
+
+
+    $pdf->Ln(6);
+    $pdf->SetFont('HelveticaNeue-Light', '', $h2);
+    $pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h2 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Modules'), 0, 1);
+
+
+    $pdf->SetFont('HelveticaNeue-Light', '', $h5);
+    //function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link='')
+    $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Controller'), 'B', 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['controller']), 'B', 1, 'R');
+
+
+    $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'DatabaseObject'), 'B', 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['databaseObject']), 'B', 1, 'R');
+
+
+
+    $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Repository'), 'B', 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['repository']), 'B', 1, 'R');
+
+
+    $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Admin'), 'B', 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['admi']), 'B', 1, 'R');
+
+
+    $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Moderator'), 'B', 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['moda']), 'B', 1, 'R');
+
+    $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Logistics'), 'B', 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['logic']), 'B', 1, 'R');
+
+
+    $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Client'), 'B', 0);
+    $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $row['client']), 'B', 1, 'R');
+
+
+    $pdf->Ln(6);
+    $pdf->SetFont('HelveticaNeue-Light', '', $h2);
+    $pdf->Cell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h2 / 2, iconv("UTF-8", "CP1254//TRANSLIT", 'Changelog'), 0, 1);
+
+    //get chgangelog where pageId = $row['id']:
+    $changelogRequest = "SELECT * FROM changet WHERE pageId = " . $row['id'];
+    $changelogResults = mysqli_query(Database::$conn, $changelogRequest);
+    $i = 1;
+    while ($changelogRow = mysqli_fetch_assoc($changelogResults)) {
+        $pdf->Ln(6);
+        $pdf->SetFont('HelveticaNeue-Light', '', $h5);
+        //function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link='')
+        $pdf->Cell($pdf->GetPageWidth() / 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $i . '. ' . $changelogRow['dateEdited']), 'B', 0);
+        $pdf->Cell($pdf->GetPageWidth() / 2, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT", $changelogRow['startd'] . ' - ' . $changelogRow['endd']), 'B', 1, 'R');
+        $pdf->Ln(2);
+
+        $pdf->SetFont('HelveticaNeue-Light', '', $h5);
+        $pdf->MultiCell($pdf->GetPageWidth() - intval($rightMargin) * 4, $h5 / 2, iconv("UTF-8", "CP1254//TRANSLIT",  $changelogRow['note']), 0, 1);
+        $i++;
+    }
+}
+
+$pdf->Output();
+exit;
